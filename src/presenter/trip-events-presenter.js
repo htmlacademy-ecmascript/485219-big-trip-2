@@ -10,7 +10,7 @@ const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsFormElement = new TripEventsFormView();
 
 export default class TripEventsPresenter {
-  static init() {
+  init() {
     render(tripEventsFormElement, tripEventsSectionElement, RenderPosition.AFTERBEGIN);
     render(new TripSortDayView(), tripEventsFormElement.getElement());
     render(new TripSortEventView(), tripEventsFormElement.getElement());
