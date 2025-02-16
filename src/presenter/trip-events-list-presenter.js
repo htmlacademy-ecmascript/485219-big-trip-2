@@ -4,11 +4,13 @@ import EventsItemView from '../view/trip-events-item-view.js';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
-// const tripEventsItemElement = new EventsItemView();
+const renderCount = 3;
 
 export default class TripEventsList {
   init() {
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
-    render(new EventsItemView(), tripEventsListElement.getElement());
+    for (let i = 0; i < renderCount; i++) {
+      render(new EventsItemView(), tripEventsListElement.getElement());
+    }
   }
 }
