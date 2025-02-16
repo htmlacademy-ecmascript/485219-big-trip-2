@@ -9,4 +9,3 @@ const TripEventsList = new TripEventsListPresenter();
 TripFilter.init();
 TripEvents.init();
 TripEventsList.init();
-
