@@ -9,7 +9,7 @@ import TripSortOfferView from '../view/trip-sort-offer-view.js';
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsFormElement = new TripEventsFormView();
 
-export default class TripEventsPresenter {
+export default class TripTimeFilterPresenter {
   init() {
     render(tripEventsFormElement, tripEventsSectionElement, RenderPosition.AFTERBEGIN);
     render(new TripSortDayView(), tripEventsFormElement.getElement());
