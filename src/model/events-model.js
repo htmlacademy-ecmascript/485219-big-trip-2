@@ -19,7 +19,7 @@ export default class EventModel {
     return this.offers.find((offer) => offer.type === type);
   }
 
-  findIdInType(type, id) {
+  getOffersInTypeById(type, id) {
     const offerType = this.getOfferByType(type);
 
     if (offerType) {

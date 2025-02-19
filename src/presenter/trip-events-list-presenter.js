@@ -19,7 +19,12 @@ export default class TripEventsList {
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
     render(new EventsItemEditView(), tripEventsListElement.getElement());
     for (let i = 0; i < renderCount; i++) {
-      render(new EventsItemView(), tripEventsListElement.getElement());
+      render(new EventsItemView({
+        point: this.eventsListPoints[i],
+        offers: [...this.eventsModel.getOffersInTypeById(this.eventsListPoints[i].type,
+          this.eventsListPoints[i].offers)],
+        destination: this.eventsListPoints[i].getDestination()
+      }), tripEventsListElement.getElement());
     }
   }
 }
