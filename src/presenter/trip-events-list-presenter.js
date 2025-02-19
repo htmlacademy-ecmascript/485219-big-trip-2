@@ -8,7 +8,14 @@ const tripEventsListElement = new TripEventsListView();
 const renderCount = 3;
 
 export default class TripEventsList {
+
+  constructor(eventsModel) {
+    this.eventsModel = eventsModel;
+  }
+
   init() {
+    this.eventsListPoints = [...this.eventsModel.getPoints()];
+
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
     render(new EventsItemEditView(), tripEventsListElement.getElement());
     for (let i = 0; i < renderCount; i++) {
