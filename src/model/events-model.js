@@ -15,16 +15,19 @@ export default class EventModel {
     return this.offers;
   }
 
-  getOfferByType(type) {
-    return this.offers.find((offer) => offer.type === type);
+  getOffersByType(type) {
+    const offerType = this.offers.find((offer) => offer.type === type);
+
+    return offerType ? offerType.offers : [];
   }
 
-  getOffersInTypeById(type, id) {
-    const offerType = this.getOfferByType(type);
+  getSelectedOffers(type, ids) {
+    const availableOffers = this.getOffersByType(type);
+    const selectedOffers = ids;
 
-    if (offerType) {
-      return offerType.offers.find((offer) => offer.id === id);
-    }
+    const matchingOffers = selectedOffers.filter((offer) => availableOffers.some((available) => available.id === offer));
+    console.log(matchingOffers);
+    return matchingOffers;
   }
 
   getDestination() {
