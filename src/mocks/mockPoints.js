@@ -7,7 +7,7 @@ export const mockPoints = [
     'dateFrom': '2019-10-10T12:10:59.845Z',
     'dateTo': '2019-11-10T12:22:13.375Z',
     'destination': 'siUUzvCFizdQ',
-    'isFavorite': !!getRandomInteger(0, 1),
+    'isFavorite': !!getRandomInteger(0, 2),
     'offers': [
       'tKsBEg6wGGCG',
       'qQK68Pzrrsjj',
@@ -21,7 +21,7 @@ export const mockPoints = [
     'dateFrom': '2020-07-10T22:55:56.845Z',
     'dateTo': '2020-07-11T11:22:13.375Z',
     'destination': 'Sza1LJiBjOji',
-    'isFavorite': !!getRandomInteger(0, 1),
+    'isFavorite': !!getRandomInteger(0, 2),
     'offers': [
       'GM3MnKNc8LOD',
       'osoqia7I1bvO'
@@ -34,7 +34,7 @@ export const mockPoints = [
     'dateFrom': '2021-07-10T22:55:56.845Z',
     'dateTo': '2021-07-11T11:22:13.375Z',
     'destination': 'YST7gQpgFLu0',
-    'isFavorite': !!getRandomInteger(0, 1),
+    'isFavorite': !!getRandomInteger(0, 2),
     'offers': [
       '3GqzIfqz9uIJ',
       '9KCjC9XS9LNr'

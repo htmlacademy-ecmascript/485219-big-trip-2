@@ -23,14 +23,15 @@ export default class EventModel {
 
   getSelectedOffers(type, ids) {
     const availableOffers = this.getOffersByType(type);
-    const selectedOffers = ids;
 
-    const matchingOffers = selectedOffers.filter((offer) => availableOffers.some((available) => available.id === offer));
-    console.log(matchingOffers);
-    return matchingOffers;
+    if (!Array.isArray(ids)) {
+      return [];
+    }
+
+    return availableOffers.filter((offer) => ids.includes(offer.id));
   }
 
-  getDestination() {
+  getDestinations() {
     return this.destinations;
   }
 
