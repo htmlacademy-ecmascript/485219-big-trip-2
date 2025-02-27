@@ -1,4 +1,3 @@
-import {createElement} from '../render.js';
 import AbstractView from '../framework/view/abstract-view';
 
 function createTripSortOfferTemplate() {
@@ -11,13 +10,5 @@ function createTripSortOfferTemplate() {
 export default class TripSortOfferView extends AbstractView {
   get template() {
     return createTripSortOfferTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.template);
-    }
-
-    return this.element;
   }
 }

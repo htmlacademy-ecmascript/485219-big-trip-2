@@ -1,4 +1,3 @@
-import {createElement} from '../render.js';
 import AbstractView from '../framework/view/abstract-view';
 
 function createFilterPresentTemplate() {
@@ -11,13 +10,5 @@ function createFilterPresentTemplate() {
 export default class FilterPresentView extends AbstractView {
   get template() {
     return createFilterPresentTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.template);
-    }
-
-    return this.element;
   }
 }

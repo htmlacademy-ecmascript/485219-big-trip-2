@@ -1,4 +1,3 @@
-import {createElement} from '../render.js';
 import {DATE_TIME_FORMAT} from '../const';
 import {humanizeTaskDueDate} from '../utils';
 import AbstractView from '../framework/view/abstract-view';
@@ -144,13 +143,5 @@ export default class EventsItemEditView extends AbstractView{
 
   get template() {
     return createEventsItemEditViewTemplate(this.point, this.selectedOffers, this.availableOffers);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.template);
-    }
-
-    return this.element;
   }
 }

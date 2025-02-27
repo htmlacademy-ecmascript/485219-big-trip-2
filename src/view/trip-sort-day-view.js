@@ -1,4 +1,3 @@
-import {createElement} from '../render.js';
 import AbstractView from '../framework/view/abstract-view';
 
 function createTripSortDayTemplate() {
@@ -11,13 +10,5 @@ function createTripSortDayTemplate() {
 export default class TripSortDayView extends AbstractView {
   get template() {
     return createTripSortDayTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.template);
-    }
-
-    return this.element;
   }
 }

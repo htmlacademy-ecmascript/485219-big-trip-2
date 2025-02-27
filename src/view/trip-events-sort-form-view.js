@@ -1,4 +1,3 @@
-import {createElement} from '../render.js';
 import AbstractView from '../framework/view/abstract-view';
 
 function createTripEventsFormTemplate() {
@@ -8,13 +7,5 @@ function createTripEventsFormTemplate() {
 export default class TripEventsFormView extends AbstractView {
   get template() {
     return createTripEventsFormTemplate();
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.template);
-    }
-
-    return this.element;
   }
 }
