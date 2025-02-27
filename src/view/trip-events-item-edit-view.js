@@ -1,6 +1,7 @@
 import {createElement} from '../render.js';
 import {DATE_TIME_FORMAT} from '../const';
 import {humanizeTaskDueDate} from '../utils';
+import AbstractView from '../framework/view/abstract-view';
 
 function createEventOfferSelectorTemplate(availableOffers, selectedOffers) {
   const isChecked = selectedOffers.some((selected) => selected.id === availableOffers.id);
@@ -132,27 +133,24 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
             </li>`;
 }
 
-export default class EventsItemEditView {
+export default class EventsItemEditView extends AbstractView{
 
   constructor({point, selectedOffers, availableOffers}) {
+    super();
     this.point = point;
     this.selectedOffers = selectedOffers;
     this.availableOffers = availableOffers;
   }
 
-  getTemplate() {
+  get template() {
     return createEventsItemEditViewTemplate(this.point, this.selectedOffers, this.availableOffers);
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createElement(this.getTemplate());
+      this.element = createElement(this.template);
     }
 
     return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

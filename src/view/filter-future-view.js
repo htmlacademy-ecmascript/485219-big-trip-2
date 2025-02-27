@@ -1,4 +1,5 @@
 import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createFilterFutureTemplate() {
   return '<div class="trip-filters__filter">\n' +
@@ -7,20 +8,16 @@ function createFilterFutureTemplate() {
     '     </div>';
 }
 
-export default class RenderFilterFutureView {
-  getTemplate() {
+export default class RenderFilterFutureView extends AbstractView {
+  get template() {
     return createFilterFutureTemplate();
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createElement(this.getTemplate());
+      this.element = createElement(this.template);
     }
 
     return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

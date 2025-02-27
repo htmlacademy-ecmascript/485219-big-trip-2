@@ -1,4 +1,5 @@
 import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createTripSortPriceTemplate() {
   return '<div class="trip-sort__item  trip-sort__item--price">\n' +
@@ -7,20 +8,16 @@ function createTripSortPriceTemplate() {
     '            </div>';
 }
 
-export default class TripSortPriceView {
-  getTemplate() {
+export default class TripSortPriceView extends AbstractView {
+  get template() {
     return createTripSortPriceTemplate();
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createElement(this.getTemplate());
+      this.element = createElement(this.template);
     }
 
     return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

@@ -1,4 +1,5 @@
 import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createTripSortTimeTemplate() {
   return '<div class="trip-sort__item  trip-sort__item--time">\n' +
@@ -7,20 +8,16 @@ function createTripSortTimeTemplate() {
     '     </div>';
 }
 
-export default class TripSortTimeView {
-  getTemplate() {
+export default class TripSortTimeView extends AbstractView {
+  get template() {
     return createTripSortTimeTemplate();
   }
 
   getElement() {
     if (!this.element) {
-      this.element = createElement(this.getTemplate());
+      this.element = createElement(this.template);
     }
 
     return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
