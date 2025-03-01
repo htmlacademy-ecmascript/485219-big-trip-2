@@ -1,6 +1,6 @@
-import {createElement} from '../render.js';
 import {DATE_FORMAT, TIME_FORMAT} from '../const';
 import {humanizeTaskDueDate} from '../utils';
+import AbstractView from '../framework/view/abstract-view';
 
 function createOfferTemplate({title, price}) {
   return (
@@ -51,27 +51,28 @@ function createEventsItemViewTemplate(point, offers, destination) {
      </li>`;
 }
 
-export default class EventsItemView {
+export default class EventsItemView extends AbstractView{
+  #point;
+  #offers;
+  #destination;
+  #handleEditClick;
 
-  constructor({point, offers, destination}) {
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+
+  constructor({point, offers, destination, onEditClick}) {
+    super();
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#handleEditClick = onEditClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate() {
-    return createEventsItemViewTemplate(this.point, this.offers, this.destination);
+  get template() {
+    return createEventsItemViewTemplate(this.#point, this.#offers, this.#destination);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }

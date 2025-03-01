@@ -1,6 +1,6 @@
-import {createElement} from '../render.js';
 import {DATE_TIME_FORMAT} from '../const';
 import {humanizeTaskDueDate} from '../utils';
+import AbstractView from '../framework/view/abstract-view';
 
 function createEventOfferSelectorTemplate(availableOffers, selectedOffers) {
   const isChecked = selectedOffers.some((selected) => selected.id === availableOffers.id);
@@ -132,27 +132,35 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
             </li>`;
 }
 
-export default class EventsItemEditView {
+export default class EventsItemEditView extends AbstractView{
+  #point;
+  #selectedOffers;
+  #availableOffers;
+  #handleSubmitClick;
+  #handleEditClick;
 
-  constructor({point, selectedOffers, availableOffers}) {
-    this.point = point;
-    this.selectedOffers = selectedOffers;
-    this.availableOffers = availableOffers;
+  constructor({point, selectedOffers, availableOffers, onFormSubmit, onEditClick}) {
+    super();
+    this.#point = point;
+    this.#selectedOffers = selectedOffers;
+    this.#availableOffers = availableOffers;
+    this.#handleSubmitClick = onFormSubmit;
+    this.#handleEditClick = onEditClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#submitClickHandler);
   }
 
-  getTemplate() {
-    return createEventsItemEditViewTemplate(this.point, this.selectedOffers, this.availableOffers);
+  get template() {
+    return createEventsItemEditViewTemplate(this.#point, this.#selectedOffers, this.#availableOffers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }
