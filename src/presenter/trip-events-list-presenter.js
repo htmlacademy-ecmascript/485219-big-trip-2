@@ -6,8 +6,6 @@ import {replace} from '../framework/render';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
-// console.log(tripEventsListElement);
-// const renderCount = 3;
 
 export default class TripEventsList {
   #eventsModel;
@@ -16,10 +14,6 @@ export default class TripEventsList {
   #tripEvents;
   #destinations;
   #offers;
-
-  // constructor(listContainer) {
-  //   this.#listContainer = tripEventsListElement;
-  // }
 
   constructor(eventsModel) {
     this.#eventsModel = eventsModel;
@@ -32,38 +26,17 @@ export default class TripEventsList {
     this.#destinations = [...this.#eventsModel.destinations];
     this.#offers = [...this.#eventsModel.offers];
     this.#renderEventsListPoints();
-
-    // render(tripEventsListElement, this.#listContainer, RenderPosition.BEFOREEND);
-
-    // render(new EventsItemEditView({
-    //   point: this.eventsListPoints[0],
-    //   selectedOffers: [...this.eventsModel.getSelectedOffers(this.eventsListPoints[0].type, this.eventsListPoints[0].offers)],
-    //   availableOffers: [...this.eventsModel.getOffersByType(this.eventsListPoints[0].type)]
-    // }), tripEventsListElement.element);
-
-    // for (let i = 0; i < renderCount; i++) {
-    //   render(new EventsItemView({
-    //     point: this.eventsListPoints[i],
-    //     offers: [...this.#eventsModel.getSelectedOffers(this.eventsListPoints[i].type, this.eventsListPoints[i].offers)],
-    //     destination: this.#eventsModel.getDestinationById(this.eventsListPoints[i].destination),
-    //   }), tripEventsListElement.element);
-    // }
   }
 
   #renderEventsListPoints() {
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
-
-    // if (!(this.#listContainer instanceof Element)) {
-    //   console.error('Ошибка: this.#listContainer не является DOM-элементом', this.#listContainer);
-    //   return;
-    // }
 
     for (let i = 0; i < this.#eventsListPoints.length; i++) {
       this.#renderEventPoint(this.#eventsListPoints[i], this.#offers, this.#destinations);
     }
   }
 
-  #renderEventPoint(point, offers, destinations) {
+  #renderEventPoint(point) {
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape') {
         evt.preventDefault();

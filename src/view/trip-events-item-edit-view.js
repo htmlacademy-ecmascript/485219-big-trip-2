@@ -133,15 +133,34 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
 }
 
 export default class EventsItemEditView extends AbstractView{
+  #point;
+  #selectedOffers;
+  #availableOffers;
+  #handleSubmitClick;
+  #handleEditClick;
 
-  constructor({point, selectedOffers, availableOffers}) {
+  constructor({point, selectedOffers, availableOffers, onFormSubmit, onEditClick}) {
     super();
-    this.point = point;
-    this.selectedOffers = selectedOffers;
-    this.availableOffers = availableOffers;
+    this.#point = point;
+    this.#selectedOffers = selectedOffers;
+    this.#availableOffers = availableOffers;
+    this.#handleSubmitClick = onFormSubmit;
+    this.#handleEditClick = onEditClick;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#submitClickHandler);
   }
 
   get template() {
-    return createEventsItemEditViewTemplate(this.point, this.selectedOffers, this.availableOffers);
+    return createEventsItemEditViewTemplate(this.#point, this.#selectedOffers, this.#availableOffers);
   }
+
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditClick();
+  };
 }
