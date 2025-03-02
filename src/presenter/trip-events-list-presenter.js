@@ -1,8 +1,9 @@
 import {render, RenderPosition} from '../render.js';
+import {replace} from '../framework/render';
 import TripEventsListView from '../view/trip-events-list-view.js';
 import EventsItemEditView from '../view/trip-events-item-edit-view.js';
 import EventsItemView from '../view/trip-events-item-view.js';
-import {replace} from '../framework/render';
+import EventsEmptyView from '../view/trip-events-empty-view.js';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
@@ -29,6 +30,11 @@ export default class TripEventsList {
   }
 
   #renderEventsListPoints() {
+    if (this.#tripEvents.length === 0) {
+      render(new EventsEmptyView(), tripEventsSectionElement);
+      return;
+    }
+
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
 
     for (let i = 0; i < this.#eventsListPoints.length; i++) {
@@ -59,6 +65,7 @@ export default class TripEventsList {
       point,
       selectedOffers: [...this.#eventsModel.getSelectedOffers(point.type, point.offers)],
       availableOffers: [...this.#eventsModel.getOffersByType(point.type)],
+      destination: this.#eventsModel.getDestinationById(point.destination),
       onFormSubmit: () => {
         replaceFormToItem();
         document.removeEventListener('keydown', escKeyDownHandler);
