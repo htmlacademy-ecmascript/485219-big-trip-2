@@ -11,9 +11,9 @@ const filterFormElement = new FilterFormView();
 export default class TripFilterPresenter {
   init() {
     render(filterFormElement, tripControlsFilterElement, RenderPosition.AFTERBEGIN);
-    render(new FilterEverythingView(), filterFormElement.getElement());
-    render(new FilterFutureView(), filterFormElement.getElement());
-    render(new FilterPresentView(), filterFormElement.getElement());
-    render(new FilterPastView(), filterFormElement.getElement());
+    render(new FilterEverythingView(), filterFormElement.element);
+    render(new FilterFutureView(), filterFormElement.element);
+    render(new FilterPresentView(), filterFormElement.element);
+    render(new FilterPastView(), filterFormElement.element);
   }
 }

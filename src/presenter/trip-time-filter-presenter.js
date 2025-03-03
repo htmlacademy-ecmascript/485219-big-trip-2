@@ -12,11 +12,11 @@ const tripEventsFormElement = new TripEventsFormView();
 export default class TripTimeFilterPresenter {
   init() {
     render(tripEventsFormElement, tripEventsSectionElement, RenderPosition.AFTERBEGIN);
-    render(new TripSortDayView(), tripEventsFormElement.getElement());
-    render(new TripSortEventView(), tripEventsFormElement.getElement());
-    render(new TripSortTimeView(), tripEventsFormElement.getElement());
-    render(new TripSortPriceView(), tripEventsFormElement.getElement());
-    render(new TripSortOfferView(), tripEventsFormElement.getElement());
+    render(new TripSortDayView(), tripEventsFormElement.element);
+    render(new TripSortEventView(), tripEventsFormElement.element);
+    render(new TripSortTimeView(), tripEventsFormElement.element);
+    render(new TripSortPriceView(), tripEventsFormElement.element);
+    render(new TripSortOfferView(), tripEventsFormElement.element);
   }
 }
 
