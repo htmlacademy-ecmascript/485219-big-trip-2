@@ -1,38 +1,44 @@
 import {render, RenderPosition} from '../render.js';
+import {replace} from '../framework/render';
 import TripEventsListView from '../view/trip-events-list-view.js';
 import EventsItemEditView from '../view/trip-events-item-edit-view.js';
 import EventsItemView from '../view/trip-events-item-view.js';
-import {replace} from '../framework/render';
+import EventsEmptyView from '../view/trip-events-empty-view.js';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
 
 export default class TripEventsList {
   #eventsModel;
-  #listContainer;
+  #listContainerElement;
   #eventsListPoints;
-  #tripEvents;
-  #destinations;
-  #offers;
+  #tripEventsData;
+  #destinationsData;
+  #offersData;
 
   constructor(eventsModel) {
     this.#eventsModel = eventsModel;
-    this.#listContainer = tripEventsListElement;
+    this.#listContainerElement = tripEventsListElement;
   }
 
   init() {
     this.#eventsListPoints = [...this.#eventsModel.getPoints()];
-    this.#tripEvents = [...this.#eventsModel.points];
-    this.#destinations = [...this.#eventsModel.destinations];
-    this.#offers = [...this.#eventsModel.offers];
+    this.#tripEventsData = [...this.#eventsModel.points];
+    this.#destinationsData = [...this.#eventsModel.destinations];
+    this.#offersData = [...this.#eventsModel.offers];
     this.#renderEventsListPoints();
   }
 
   #renderEventsListPoints() {
+    if (this.#tripEventsData.length === 0) {
+      render(new EventsEmptyView(), tripEventsSectionElement);
+      return;
+    }
+
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
 
     for (let i = 0; i < this.#eventsListPoints.length; i++) {
-      this.#renderEventPoint(this.#eventsListPoints[i], this.#offers, this.#destinations);
+      this.#renderEventPoint(this.#eventsListPoints[i], this.#offersData, this.#destinationsData);
     }
   }
 
@@ -59,6 +65,7 @@ export default class TripEventsList {
       point,
       selectedOffers: [...this.#eventsModel.getSelectedOffers(point.type, point.offers)],
       availableOffers: [...this.#eventsModel.getOffersByType(point.type)],
+      destination: this.#eventsModel.getDestinationById(point.destination),
       onFormSubmit: () => {
         replaceFormToItem();
         document.removeEventListener('keydown', escKeyDownHandler);

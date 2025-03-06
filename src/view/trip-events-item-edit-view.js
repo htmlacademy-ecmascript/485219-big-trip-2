@@ -15,8 +15,9 @@ function createEventOfferSelectorTemplate(availableOffers, selectedOffers) {
             </div>`;
 }
 
-function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers) {
+function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination) {
   const { basePrice, dateFrom, dateTo, type } = point;
+  const { name, description } = destination;
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -24,7 +25,7 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
                   <div class="event__type-wrapper">
                     <label class="event__type  event__type-btn" for="event-type-toggle-1">
                       <span class="visually-hidden">Choose event type</span>
-                      <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+                      <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
                     </label>
                     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -84,7 +85,7 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
                     <label class="event__label  event__type-output" for="event-destination-1">
                       ${type}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
                     <datalist id="destination-list-1">
                       <option value="Amsterdam"></option>
                       <option value="Geneva"></option>
@@ -125,7 +126,7 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
 
                   <section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">Chamonix-Mont-Blanc (usually shortened to Chamonix) is a resort area near the junction of France, Switzerland and Italy. At the base of Mont Blanc, the highest summit in the Alps, it's renowned for its skiing.</p>
+                    <p class="event__destination-description">${description}</p>
                   </section>
                 </section>
               </form>
@@ -136,14 +137,16 @@ export default class EventsItemEditView extends AbstractView{
   #point;
   #selectedOffers;
   #availableOffers;
+  #destination;
   #handleSubmitClick;
   #handleEditClick;
 
-  constructor({point, selectedOffers, availableOffers, onFormSubmit, onEditClick}) {
+  constructor({point, selectedOffers, availableOffers, destination, onFormSubmit, onEditClick}) {
     super();
     this.#point = point;
     this.#selectedOffers = selectedOffers;
     this.#availableOffers = availableOffers;
+    this.#destination = destination;
     this.#handleSubmitClick = onFormSubmit;
     this.#handleEditClick = onEditClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
@@ -151,7 +154,7 @@ export default class EventsItemEditView extends AbstractView{
   }
 
   get template() {
-    return createEventsItemEditViewTemplate(this.#point, this.#selectedOffers, this.#availableOffers);
+    return createEventsItemEditViewTemplate(this.#point, this.#selectedOffers, this.#availableOffers, this.#destination);
   }
 
   #submitClickHandler = (evt) => {
