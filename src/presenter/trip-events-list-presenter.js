@@ -11,8 +11,6 @@ export default class TripEventsList {
   #listContainerElement;
   #eventsListPoints;
   #tripEventsData;
-  #destinationsData;
-  #offersData;
 
   constructor(eventsModel) {
     this.#eventsModel = eventsModel;
@@ -22,8 +20,6 @@ export default class TripEventsList {
   init() {
     this.#eventsListPoints = [...this.#eventsModel.getPoints()];
     this.#tripEventsData = [...this.#eventsModel.points];
-    this.#destinationsData = [...this.#eventsModel.destinations];
-    this.#offersData = [...this.#eventsModel.offers];
 
     this.#renderEventsListPoints();
   }
@@ -39,13 +35,14 @@ export default class TripEventsList {
     this.#eventsListPoints.forEach((point) => {
       const eventPresenter = new TripEventPresenter({
         listContainerElement: tripEventsListElement,
-        point: point,
-        selectedOffersData: [...this.#eventsModel.getSelectedOffers(point.type, point.offers)],
-        offersData: [...this.#eventsModel.getOffersByType(point.type)],
-        destinationsData: [...this.#eventsModel.destinations],
       });
 
-      eventPresenter.init();
+      eventPresenter.init({
+        point: point,
+        selectedOffersData: [...this.#eventsModel.getSelectedOffers(point.type, point.offers)],
+        availableOffersData: [...this.#eventsModel.getOffersByType(point.type)],
+        destination: this.#eventsModel.getDestinationById(point.destination),
+      });
     });
   }
 }

@@ -1,5 +1,5 @@
 import {render} from '../render';
-import {replace} from '../framework/render';
+import {remove, replace} from '../framework/render';
 import EventsItemEditView from '../view/trip-events-item-edit-view.js';
 import EventsItemView from '../view/trip-events-item-view.js';
 
@@ -7,25 +7,45 @@ export default class TripEventPresenter {
   #point;
   #selectedOffersData;
   #availableOffersData;
-  #destinationsData;
+  #destination;
   #tripEventsListContainerElement;
 
-  #eventComponent;
-  #eventEditFormComponent;
+  #eventComponent = null;
+  #eventEditFormComponent = null;
 
-  constructor({ listContainerElement, point, selectedOffersData, offersData, destinationsData }) {
-    this.#point = point;
-    this.#selectedOffersData = selectedOffersData;
-    this.#availableOffersData = offersData;
-    this.#destinationsData = destinationsData;
+  constructor({listContainerElement}) {
     this.#tripEventsListContainerElement = listContainerElement;
   }
 
-  init() {
-    this.#renderEventPoint();
+  init({point, selectedOffersData, availableOffersData, destination}) {
+    this.#point = point;
+    this.#selectedOffersData = selectedOffersData;
+    this.#availableOffersData = availableOffersData;
+    this.#destination = destination;
+
+    const prevEventComponent = this.#eventComponent;
+    const prevEventEditFormComponent = this.#eventEditFormComponent;
+
+    this.#createEventPoint();
+
+    if (prevEventComponent === null || prevEventEditFormComponent === null) {
+      render(this.#eventComponent, this.#tripEventsListContainerElement.element);
+      return;
+    }
+
+    if (this.#tripEventsListContainerElement.contains(prevEventComponent.element)) {
+      replace(this.#eventComponent, prevEventComponent);
+    }
+
+    if (this.#tripEventsListContainerElement.contains(prevEventEditFormComponent)) {
+      replace(this.#eventEditFormComponent, prevEventEditFormComponent);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditFormComponent);
   }
 
-  #renderEventPoint() {
+  #createEventPoint() {
     const escKeyDownHandler = (evt) => {
       if (evt.key === 'Escape') {
         evt.preventDefault();
@@ -37,7 +57,7 @@ export default class TripEventPresenter {
     this.#eventComponent = new EventsItemView({
       point: this.#point,
       offers: this.#availableOffersData,
-      destination: this.#destinationsData,
+      destination: this.#destination,
       onEditClick: () => {
         this.#replaceItemToForm();
         document.addEventListener('keydown', escKeyDownHandler);
@@ -48,7 +68,7 @@ export default class TripEventPresenter {
       point: this.#point,
       selectedOffers: this.#selectedOffersData,
       availableOffers: this.#availableOffersData,
-      destination: this.#destinationsData,
+      destination: this.#destination,
       onFormSubmit: () => {
         this.#replaceFormToItem();
         document.removeEventListener('keydown', escKeyDownHandler);
@@ -58,8 +78,6 @@ export default class TripEventPresenter {
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     });
-
-    render(this.#eventComponent, this.#tripEventsListContainerElement.element);
   }
 
   #replaceItemToForm() {
@@ -68,5 +86,10 @@ export default class TripEventPresenter {
 
   #replaceFormToItem() {
     replace(this.#eventComponent, this.#eventEditFormComponent);
+  }
+
+  destroy() {
+    remove(this.#eventComponent);
+    remove(this.#eventEditFormComponent);
   }
 }
