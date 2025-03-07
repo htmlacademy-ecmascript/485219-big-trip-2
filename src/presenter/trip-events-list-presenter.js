@@ -12,6 +12,8 @@ export default class TripEventsList {
   #eventsListPoints;
   #tripEventsData;
 
+  #eventPresenters = new Map();
+
   constructor(eventsModel) {
     this.#eventsModel = eventsModel;
     this.#listContainerElement = tripEventsListElement;
@@ -43,6 +45,8 @@ export default class TripEventsList {
         availableOffersData: [...this.#eventsModel.getOffersByType(point.type)],
         destination: this.#eventsModel.getDestinationById(point.destination),
       });
+
+      this.#eventPresenters.set(point.id, eventPresenter);
     });
   }
 }
