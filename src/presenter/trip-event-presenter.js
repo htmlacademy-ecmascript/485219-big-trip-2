@@ -9,12 +9,14 @@ export default class TripEventPresenter {
   #availableOffersData;
   #destination;
   #tripEventsListContainerElement;
+  #onDataChange;
 
   #eventComponent = null;
   #eventEditFormComponent = null;
 
-  constructor({listContainerElement}) {
+  constructor({listContainerElement, onDataChange}) {
     this.#tripEventsListContainerElement = listContainerElement;
+    this.#onDataChange = onDataChange;
   }
 
   init({point, selectedOffersData, availableOffersData, destination}) {
@@ -33,11 +35,11 @@ export default class TripEventPresenter {
       return;
     }
 
-    if (this.#tripEventsListContainerElement.contains(prevEventComponent.element)) {
+    if (this.#tripEventsListContainerElement.element.contains(prevEventComponent.element)) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#tripEventsListContainerElement.contains(prevEventEditFormComponent)) {
+    if (this.#tripEventsListContainerElement.element.contains(prevEventEditFormComponent.element)) {
       replace(this.#eventEditFormComponent, prevEventEditFormComponent);
     }
 
@@ -61,6 +63,9 @@ export default class TripEventPresenter {
       onEditClick: () => {
         this.#replaceItemToForm();
         document.addEventListener('keydown', escKeyDownHandler);
+      },
+      onFavoriteClick: () => {
+        this.#handleFavoriteClick();
       }
     });
 
@@ -78,6 +83,15 @@ export default class TripEventPresenter {
         document.removeEventListener('keydown', escKeyDownHandler);
       }
     });
+  }
+
+  #handleFavoriteClick() {
+    const updatedEvent = {
+      ...this.#point,
+      isFavorite: !this.#point.isFavorite,
+    };
+
+    this.#onDataChange(updatedEvent);
   }
 
   #replaceItemToForm() {
