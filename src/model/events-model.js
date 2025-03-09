@@ -38,4 +38,8 @@ export default class EventModel {
   getDestinationById(id) {
     return this.destinations.find((destination) => destination.id === id);
   }
+
+  updatePoints(points) {
+    this.points = points;
+  }
 }

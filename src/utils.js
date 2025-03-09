@@ -17,5 +17,9 @@ function humanizeTaskDueDate(date, format) {
   return date ? dayjs(date).format(format) : '';
 }
 
-export {getRandomInteger, getRandomArrayElement, humanizeTaskDueDate};
+function updateEvent(eventsPoints, updatedEventPoint) {
+  return eventsPoints.map((eventPoint) => eventPoint.id === updatedEventPoint.id ? updatedEventPoint : eventPoint);
+}
+
+export {getRandomInteger, getRandomArrayElement, humanizeTaskDueDate, updateEvent};
 
