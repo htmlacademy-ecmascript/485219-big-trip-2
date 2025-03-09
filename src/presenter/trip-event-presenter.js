@@ -3,20 +3,30 @@ import {remove, replace} from '../framework/render';
 import EventsItemEditView from '../view/trip-events-item-edit-view.js';
 import EventsItemView from '../view/trip-events-item-view.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export default class TripEventPresenter {
   #point;
   #selectedOffersData;
   #availableOffersData;
   #destination;
   #tripEventsListContainerElement;
-  #onDataChange;
+
+  #handleDataChange;
+  #handleModeChange;
 
   #eventComponent = null;
   #eventEditFormComponent = null;
 
-  constructor({listContainerElement, onDataChange}) {
+  #mode = Mode.DEFAULT;
+
+  constructor({listContainerElement, onDataChange, onModeChange}) {
     this.#tripEventsListContainerElement = listContainerElement;
-    this.#onDataChange = onDataChange;
+    this.#handleDataChange = onDataChange;
+    this.#handleModeChange = onModeChange;
   }
 
   init({point, selectedOffersData, availableOffersData, destination}) {
@@ -35,11 +45,11 @@ export default class TripEventPresenter {
       return;
     }
 
-    if (this.#tripEventsListContainerElement.element.contains(prevEventComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#tripEventsListContainerElement.element.contains(prevEventEditFormComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#eventEditFormComponent, prevEventEditFormComponent);
     }
 
@@ -48,21 +58,13 @@ export default class TripEventPresenter {
   }
 
   #createEventPoint() {
-    const escKeyDownHandler = (evt) => {
-      if (evt.key === 'Escape') {
-        evt.preventDefault();
-        this.#replaceFormToItem();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
     this.#eventComponent = new EventsItemView({
       point: this.#point,
       offers: this.#availableOffersData,
       destination: this.#destination,
       onEditClick: () => {
         this.#replaceItemToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
+        document.addEventListener('keydown', this.#escKeyDownHandler);
       },
       onFavoriteClick: () => {
         this.#handleFavoriteClick();
@@ -76,11 +78,11 @@ export default class TripEventPresenter {
       destination: this.#destination,
       onFormSubmit: () => {
         this.#replaceFormToItem();
-        document.removeEventListener('keydown', escKeyDownHandler);
+        document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onEditClick: () => {
         this.#replaceFormToItem();
-        document.removeEventListener('keydown', escKeyDownHandler);
+        document.removeEventListener('keydown', this.#escKeyDownHandler);
       }
     });
   }
@@ -91,15 +93,39 @@ export default class TripEventPresenter {
       isFavorite: !this.#point.isFavorite,
     };
 
-    this.#onDataChange(updatedEvent);
+    this.#handleDataChange(updatedEvent);
   }
 
   #replaceItemToForm() {
     replace(this.#eventEditFormComponent, this.#eventComponent);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   #replaceFormToItem() {
     replace(this.#eventComponent, this.#eventEditFormComponent);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#replaceFormToItem();
+      document.removeEventListener('keydown', this.#escKeyDownHandler);
+    }
+  };
+
+  resetView() {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToItem();
+    }
+  }
+
+  replaceEventToForm() {
+    replace(this.#eventEditFormComponent, this.#eventComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   destroy() {
