@@ -9,7 +9,6 @@ export default class TripEventsFormView extends AbstractView {
 
   constructor({onSortTypeChange}) {
     super();
-    console.log('TripEventsFormView constructor вызван');
     this.#handleSortTypeChange = onSortTypeChange;
 
     this.element.addEventListener('click', this.#sortTypeChangeHandler);

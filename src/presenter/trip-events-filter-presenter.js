@@ -7,11 +7,8 @@ import TripSortPriceView from '../view/trip-sort-price-view.js';
 import TripSortOfferView from '../view/trip-sort-offer-view.js';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
-// const tripEventsFormElement = new TripEventsFormView();
-
 
 export default class TripEventsFilterPresenter {
-  #sortComponent;
   #tripEventsFormElement;
 
   constructor() {
