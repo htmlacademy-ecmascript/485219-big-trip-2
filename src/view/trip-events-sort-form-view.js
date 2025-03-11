@@ -5,7 +5,27 @@ function createTripEventsFormTemplate() {
 }
 
 export default class TripEventsFormView extends AbstractView {
+  #handleSortTypeChange;
+
+  constructor({onSortTypeChange}) {
+    super();
+    console.log('TripEventsFormView constructor вызван');
+    this.#handleSortTypeChange = onSortTypeChange;
+
+    this.element.addEventListener('click', this.#sortTypeChangeHandler);
+  }
+
   get template() {
     return createTripEventsFormTemplate();
   }
+
+  #sortTypeChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+
+    this.#handleSortTypeChange(evt.target.dataset.sortType);
+  };
 }
+
+
