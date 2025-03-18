@@ -1,15 +1,15 @@
 import dayjs from 'dayjs';
 
 function getWeightForNullDate(dateA, dateB) {
-  if (dateA === null && dateB === null) {
+  if (!dateA && !dateB) {
     return 0;
   }
 
-  if (dateA === null) {
+  if (!dateA) {
     return 1;
   }
 
-  if (dateB === null) {
+  if (!dateB) {
     return -1;
   }
 
