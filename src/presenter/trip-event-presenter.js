@@ -40,7 +40,7 @@ export default class TripEventPresenter {
 
     this.#createEventPoint();
 
-    if (prevEventComponent === null || prevEventEditFormComponent === null) {
+    if (!prevEventComponent || !prevEventEditFormComponent) {
       render(this.#eventComponent, this.#tripEventsListContainerElement.element);
       return;
     }

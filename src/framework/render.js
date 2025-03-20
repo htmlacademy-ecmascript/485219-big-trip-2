@@ -31,7 +31,7 @@ function render(component, container, place = RenderPosition.BEFOREEND) {
     throw new Error('Can render only components');
   }
 
-  if (container === null) {
+  if (!container) {
     throw new Error('Container element doesn\'t exist');
   }
 
@@ -53,7 +53,7 @@ function replace(newComponent, oldComponent) {
 
   const parent = oldElement.parentElement;
 
-  if (parent === null) {
+  if (!parent) {
     throw new Error('Parent element doesn\'t exist');
   }
 
@@ -65,7 +65,7 @@ function replace(newComponent, oldComponent) {
  * @param {AbstractView} component Компонент, который нужно удалить
  */
 function remove(component) {
-  if (component === null) {
+  if (!component) {
     return;
   }
 
