@@ -1,6 +1,6 @@
 import {DATE_TIME_FORMAT} from '../const';
 import {humanizeTaskDueDate} from '../utils';
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 function createEventOfferSelectorTemplate(availableOffers, selectedOffers) {
   const isChecked = selectedOffers.some((selected) => selected.id === availableOffers.id);
@@ -16,8 +16,8 @@ function createEventOfferSelectorTemplate(availableOffers, selectedOffers) {
 }
 
 function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination) {
-  const { basePrice, dateFrom, dateTo, type } = point;
-  const { name, description } = destination;
+  const {basePrice, dateFrom, dateTo, type} = point;
+  const {name, description} = destination;
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post">
@@ -133,7 +133,7 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
             </li>`;
 }
 
-export default class EventsItemEditView extends AbstractView{
+export default class EventsItemEditView extends AbstractStatefulView {
   #point;
   #selectedOffers;
   #availableOffers;
@@ -149,12 +149,12 @@ export default class EventsItemEditView extends AbstractView{
     this.#destination = destination;
     this.#handleSubmitClick = onFormSubmit;
     this.#handleEditClick = onEditClick;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
-    this.element.querySelector('.event__save-btn').addEventListener('click', this.#submitClickHandler);
+    this._setState(EventsItemEditView.parsePointToState(this.#point, this.#destination));
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEventsItemEditViewTemplate(this.#point, this.#selectedOffers, this.#availableOffers, this.#destination);
+    return createEventsItemEditViewTemplate(this._state, this.#selectedOffers, this.#availableOffers, this._state.destination);
   }
 
   #submitClickHandler = (evt) => {
@@ -166,4 +166,47 @@ export default class EventsItemEditView extends AbstractView{
     evt.preventDefault();
     this.#handleEditClick();
   };
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#submitClickHandler);
+    this.element.querySelector('.event__type-group').addEventListener('change', this.#changeTypeHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
+  }
+
+  #changeTypeHandler = (evt) => {
+    if (evt.target.closest('input')) {
+      this.updateElement({
+        type: evt.target.value
+      });
+    }
+  };
+
+  #changeDestinationHandler = (evt) => {
+    const selectedDestinationName = evt.target.value;
+
+    if (!selectedDestinationName) {
+      return;
+    }
+
+    this.updateElement({
+      destination: {
+        name: selectedDestinationName
+      }
+    });
+  };
+
+  static parsePointToState(point, destination) {
+    return {
+      ...point,
+      destination: {
+        ...destination
+      }
+    };
+  }
+
+  static parseStateToPoint(state) {
+    const point = {...state};
+    return {...point};
+  }
 }
