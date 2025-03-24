@@ -1,7 +1,7 @@
 import {render} from '../render';
 import {remove, replace} from '../framework/render';
-import EventsItemEditView from '../view/trip-events-item-edit-view.js';
-import EventsItemView from '../view/trip-events-item-view.js';
+import EventsItemEditView from '../view/trip-events-item-edit-view';
+import EventsItemView from '../view/trip-events-item-view';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -14,6 +14,7 @@ export default class TripEventPresenter {
   #availableOffersData;
   #destination;
   #tripEventsListContainerElement;
+  #eventsModel;
 
   #handleDataChange;
   #handleModeChange;
@@ -29,11 +30,12 @@ export default class TripEventPresenter {
     this.#handleModeChange = onModeChange;
   }
 
-  init({point, selectedOffersData, availableOffersData, destination}) {
+  init({point, selectedOffersData, availableOffersData, destination, eventsModel}) {
     this.#point = point;
     this.#selectedOffersData = selectedOffersData;
     this.#availableOffersData = availableOffersData;
     this.#destination = destination;
+    this.#eventsModel = eventsModel;
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditFormComponent = this.#eventEditFormComponent;
@@ -83,6 +85,23 @@ export default class TripEventPresenter {
       onEditClick: () => {
         this.#replaceFormToItem();
         document.removeEventListener('keydown', this.#escKeyDownHandler);
+      },
+      onChangeType: (newType) => {
+        const updatedOffers = this.#eventsModel.getOffersByType(newType);
+
+        this.#eventEditFormComponent.updateElement({
+          type: newType,
+          availableOffers: [...updatedOffers]
+        });
+      },
+      onChangeDestination: (newDestination) => {
+        const updatedDestination = this.#eventsModel.getDestinationByName(newDestination);
+
+        this.#eventEditFormComponent.updateElement({
+          destination: {
+            ...updatedDestination
+          }
+        });
       }
     });
   }
@@ -98,6 +117,7 @@ export default class TripEventPresenter {
 
   #replaceItemToForm() {
     replace(this.#eventEditFormComponent, this.#eventComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
@@ -117,15 +137,9 @@ export default class TripEventPresenter {
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#eventEditFormComponent.reset(this.#point, this.#destination, this.#availableOffersData);
       this.#replaceFormToItem();
     }
-  }
-
-  replaceEventToForm() {
-    replace(this.#eventEditFormComponent, this.#eventComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#handleModeChange();
-    this.#mode = Mode.EDITING;
   }
 
   destroy() {
