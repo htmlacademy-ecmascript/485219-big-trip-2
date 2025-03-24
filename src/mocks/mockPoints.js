@@ -1,10 +1,9 @@
-import {getRandomInteger, getRandomArrayElement} from '../utils.js';
+import {getRandomInteger, getRandomArrayElement} from '../utils';
 
 export const mockPoints = [
   {
     'id': '4MBPP39p0kUz',
     'basePrice': getRandomInteger(10, 30),
-    'dateFrom': '2019-10-10T12:10:59.845Z',
     'dateTo': '2019-11-10T12:22:13.375Z',
     'destination': 'siUUzvCFizdQ',
     'isFavorite': !!getRandomInteger(0, 2),

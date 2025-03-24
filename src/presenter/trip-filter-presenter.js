@@ -1,9 +1,9 @@
-import {render, RenderPosition} from '../render.js';
-import FilterEverythingView from '../view/filter-everything-view.js';
-import FilterFutureView from '../view/filter-future-view.js';
-import FilterFormView from '../view/filter-form-view.js';
-import FilterPresentView from '../view/filter-present-view.js';
-import FilterPastView from '../view/filter-past-view.js';
+import {render, RenderPosition} from '../render';
+import FilterEverythingView from '../view/filter-everything-view';
+import FilterFutureView from '../view/filter-future-view';
+import FilterFormView from '../view/filter-form-view';
+import FilterPresentView from '../view/filter-present-view';
+import FilterPastView from '../view/filter-past-view';
 
 const tripControlsFilterElement = document.querySelector('.trip-controls__filters');
 const filterFormElement = new FilterFormView();

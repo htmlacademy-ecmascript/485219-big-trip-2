@@ -86,6 +86,7 @@ export default class TripEventsList {
       selectedOffersData: [...this.#eventsModel.getSelectedOffers(point.type, point.offers)],
       availableOffersData: [...this.#eventsModel.getOffersByType(point.type)],
       destination: this.#eventsModel.getDestinationById(point.destination),
+      eventsModel: this.#eventsModel,
     });
 
     this.#eventPresenters.set(point.id, eventPresenter);
