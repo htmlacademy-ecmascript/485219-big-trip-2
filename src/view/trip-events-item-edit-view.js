@@ -162,10 +162,7 @@ export default class EventsItemEditView extends AbstractStatefulView {
 
   #isNewPoint;
 
-  constructor({
-                point, selectedOffers, availableOffers, destination, destinations, onFormSubmit,
-                onEditClick, onChangeType, onChangeDestination, onDeleteClick, isNewPoint = false
-              }) {
+  constructor({point, selectedOffers, availableOffers, destination, destinations, onFormSubmit, onEditClick, onChangeType, onChangeDestination, onDeleteClick, isNewPoint = false}) {
     super();
     this.#point = point;
     this.#selectedOffers = selectedOffers;
