@@ -1,4 +1,4 @@
-import {DATE_TIME_FORMAT} from '../const';
+import {DATE_TIME_FORMAT, UpdateType, UserAction} from '../const';
 import {humanizeTaskDueDate} from '../utils';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import flatpickr from 'flatpickr';
@@ -22,7 +22,7 @@ function createDestinationPictures(pictures) {
   return `<img class="event__photo" src=${pictures.src} alt="Event photo">`;
 }
 
-function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination) {
+function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination, destinations) {
   const {basePrice, dateFrom, dateTo, type} = point;
   const {name, description, pictures} = destination;
 
@@ -94,9 +94,7 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
                     <datalist id="destination-list-1">
-                      <option value="Amsterdam"></option>
-                      <option value="Geneva"></option>
-                      <option value="Chamonix"></option>
+                        ${destinations.map((destinationPoint) => `<option value="${destinationPoint.name}"></option>`).join('')}
                     </datalist>
                   </div>
 
@@ -152,6 +150,7 @@ export default class EventsItemEditView extends AbstractStatefulView {
   #selectedOffers;
   #availableOffers;
   #destination;
+  #destinations;
   #handleSubmitClick;
   #handleEditClick;
   #handleChangeType;
@@ -159,23 +158,48 @@ export default class EventsItemEditView extends AbstractStatefulView {
   #datepickerFrom;
   #datepickerTo;
 
-  constructor({point, selectedOffers, availableOffers, destination, onFormSubmit, onEditClick, onChangeType, onChangeDestination}) {
+  #handleDeleteClick;
+
+  #isNewPoint;
+
+  constructor({
+                point, selectedOffers, availableOffers, destination, destinations, onFormSubmit,
+                onEditClick, onChangeType, onChangeDestination, onDeleteClick, isNewPoint = false
+              }) {
     super();
     this.#point = point;
     this.#selectedOffers = selectedOffers;
     this.#availableOffers = availableOffers;
     this.#destination = destination;
+    this.#destinations = destinations;
     this.#handleSubmitClick = onFormSubmit;
     this.#handleEditClick = onEditClick;
     this.#handleChangeType = onChangeType;
     this.#handleChangeDestination = onChangeDestination;
 
+    this.#handleDeleteClick = onDeleteClick;
+
     this._setState(EventsItemEditView.parsePointToState(this.#point, this.#destination, this.#availableOffers));
     this._restoreHandlers();
+
+    this.#isNewPoint = isNewPoint;
+
+    if (this.#isNewPoint) {
+      this.#handleEditClick = () => {
+        onEditClick();
+        this.#handleFormClose();
+      };
+    }
   }
 
   get template() {
-    return createEventsItemEditViewTemplate(this._state, this._state.offers, this._state.availableOffers, this._state.destination);
+    return createEventsItemEditViewTemplate(
+      this._state,
+      this._state.offers,
+      this._state.availableOffers,
+      this._state.destination,
+      this.#destinations
+    );
   }
 
   reset(eventPoint, destination, availableOffers) {
@@ -198,7 +222,24 @@ export default class EventsItemEditView extends AbstractStatefulView {
 
   #submitClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditClick();
+
+    const priceInput = this.element.querySelector('.event__input--price');
+    const priceValue = Number(priceInput.value);
+
+    if (isNaN(priceValue)) {
+      priceInput.setCustomValidity('Цена должна быть числом');
+      priceInput.reportValidity();
+      return;
+    }
+
+    if (priceValue <= 0) {
+      priceInput.setCustomValidity('Цена должна быть больше 0');
+      priceInput.reportValidity();
+      return;
+    }
+
+    priceInput.setCustomValidity('');
+    this.#handleSubmitClick(EventsItemEditView.parseStateToPoint(this._state));
   };
 
   #editClickHandler = (evt) => {
@@ -212,25 +253,54 @@ export default class EventsItemEditView extends AbstractStatefulView {
     this.element.querySelector('.event__type-group').addEventListener('change', this.#changeTypeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
     this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeOffersHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
     this.#setDatepickers();
+
+    if (this.#isNewPoint) {
+      this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleFormClose);
+    }
+
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#priceInputHandler);
   }
 
   #changeTypeHandler = (evt) => {
     if (evt.target.closest('input')) {
       const newType = evt.target.value;
-
       this.#handleChangeType(newType);
+
+      this.updateElement({
+        destination: this.#destinations[0]
+      });
     }
   };
 
   #changeDestinationHandler = (evt) => {
     const selectedDestinationName = evt.target.value;
 
-    if (!selectedDestinationName) {
+    const isValidDestination = this.#destinations.some(
+      (dest) => dest.name === selectedDestinationName
+    );
+
+    if (!isValidDestination) {
+      evt.target.setCustomValidity('Выберите пункт назначения из списка');
+      evt.target.reportValidity();
       return;
     }
 
+    evt.target.setCustomValidity('');
     this.#handleChangeDestination(selectedDestinationName);
+  };
+
+  #priceInputHandler = (evt) => {
+    const priceInput = evt.target;
+
+    const newValue = priceInput.value.replace(/[^0-9]/g, '');
+
+    if (priceInput.value !== newValue) {
+      priceInput.value = newValue;
+    }
+
+    this._state.basePrice = newValue ? Number(newValue) : 0;
   };
 
   #changeOffersHandler = (evt) => {
@@ -255,7 +325,7 @@ export default class EventsItemEditView extends AbstractStatefulView {
     const commonConfig = {
       dateFormat: 'd/m/y H:i',
       enableTime: true,
-      locale: { firstDayOfWeek: 1 },
+      locale: {firstDayOfWeek: 1},
       'time_24hr': true
     };
 
@@ -292,6 +362,19 @@ export default class EventsItemEditView extends AbstractStatefulView {
     });
   }
 
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(EventsItemEditView.parseStateToPoint(this._state));
+  };
+
+
+  #handleFormClose = () => {
+    if (this.#isNewPoint) {
+      this.#handleDeleteClick(UserAction.DELETE_POINT, UpdateType.MINOR, this._state);
+    }
+    this.#handleEditClick();
+  };
+
   static parsePointToState(point, destination, availableOffers) {
     return {
       ...point,
@@ -302,13 +385,11 @@ export default class EventsItemEditView extends AbstractStatefulView {
     };
   }
 
-  static parseStateToPoint(eventPoint, destination, availableOffers) {
+  static parseStateToPoint(state) {
     return {
-      ...eventPoint,
-      destination: {
-        ...destination
-      },
-      availableOffers: [...availableOffers]
+      ...state,
+      destination: state.destination.id,
+      availableOffers: [...state.availableOffers]
     };
   }
 }
