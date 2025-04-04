@@ -81,8 +81,6 @@ export default class EventPointApiService extends ApiService {
     delete adaptedPoint.isFavorite;
     delete adaptedPoint.availableOffers;
 
-    console.log(adaptedPoint);
-
     return adaptedPoint;
   }
 
