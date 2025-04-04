@@ -65,7 +65,7 @@ export default class EventModel extends Observable {
       const newPoint = this.#adaptToClient(response);
       this.#points = [newPoint, ...this.#points];
       this._notify(UpdateType.MAJOR, newPoint);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Can\'t add task');
     }
   }
@@ -83,7 +83,7 @@ export default class EventModel extends Observable {
         ...this.#points.slice(index + 1),
       ];
       this._notify(updateType);
-    } catch(err) {
+    } catch (err) {
       throw new Error('Can\'t delete task');
     }
   }
