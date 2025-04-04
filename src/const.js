@@ -8,5 +8,47 @@ const SortType = {
   PRICE: 'price'
 };
 
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
 
-export {DATE_FORMAT, TIME_FORMAT, DATE_TIME_FORMAT, SortType};
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const FILTERS = [
+  {
+    type: 'everything',
+    filter: (events) => events.filter((event) => event),
+    isChecked: true,
+  },
+  {
+    type: 'future',
+    filter: (events) => events.filter((event) => event.dateTo > new Date()),
+    isChecked: false,
+  },
+  {
+    type: 'present',
+    filter: (events) => events.filter((event) => event.dateTo > new Date() && event.dateFrom < new Date()),
+    isChecked: false,
+  },
+  {
+    type: 'past',
+    filter: (events) => events.filter((event) => event.dateFrom < new Date()),
+    isChecked: false,
+  },
+];
+
+const EmptyListMessages = {
+  EVERYTHING: 'Click New Event to create your first point',
+  FUTURE: 'There are no future events now',
+  PRESENT: 'There are no present events now',
+  PAST: 'There are no past events now',
+};
+
+
+export {DATE_FORMAT, TIME_FORMAT, DATE_TIME_FORMAT, SortType, UserAction, UpdateType, FILTERS, EmptyListMessages};

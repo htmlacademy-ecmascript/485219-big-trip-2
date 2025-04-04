@@ -10,4 +10,8 @@ export default class RenderFilterFormView extends AbstractView {
   get template() {
     return createFilterFormTemplate();
   }
+
+  clear() {
+    this.element.innerHTML = '';
+  }
 }

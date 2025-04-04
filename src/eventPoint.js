@@ -38,4 +38,8 @@ function sortEventByTime(eventA, eventB) {
   return durationB - durationA;
 }
 
-export {sortEventByDate, sortEventByPrice, sortEventByTime};
+function isDatesEqual(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
+}
+
+export {sortEventByDate, sortEventByPrice, sortEventByTime, isDatesEqual};

@@ -1,7 +1,9 @@
-import {render} from '../render';
 import {remove, replace} from '../framework/render';
 import EventsItemEditView from '../view/trip-events-item-edit-view';
 import EventsItemView from '../view/trip-events-item-view';
+import {UpdateType, UserAction} from '../const';
+import {isDatesEqual} from '../eventPoint';
+import {render, RenderPosition} from '../render'; // Добавляем RenderPosition
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,10 +26,13 @@ export default class TripEventPresenter {
 
   #mode = Mode.DEFAULT;
 
-  constructor({listContainerElement, onDataChange, onModeChange}) {
+  #isNewPoint;
+
+  constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false}) {
     this.#tripEventsListContainerElement = listContainerElement;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
+    this.#isNewPoint = isNewPoint;
   }
 
   init({point, selectedOffersData, availableOffersData, destination, eventsModel}) {
@@ -43,7 +48,11 @@ export default class TripEventPresenter {
     this.#createEventPoint();
 
     if (!prevEventComponent || !prevEventEditFormComponent) {
-      render(this.#eventComponent, this.#tripEventsListContainerElement.element);
+      if (this.#isNewPoint) {
+        this.#replaceItemToForm();
+      } else {
+        render(this.#eventComponent, this.#tripEventsListContainerElement.element);
+      }
       return;
     }
 
@@ -78,8 +87,9 @@ export default class TripEventPresenter {
       selectedOffers: this.#selectedOffersData,
       availableOffers: this.#availableOffersData,
       destination: this.#destination,
-      onFormSubmit: () => {
-        this.#replaceFormToItem();
+      destinations: this.#eventsModel.getDestinations(),
+      onFormSubmit: (eventPoint) => {
+        this.#handleFormSubmit(eventPoint);
         document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onEditClick: () => {
@@ -102,9 +112,28 @@ export default class TripEventPresenter {
             ...updatedDestination
           }
         });
+      },
+      onDeleteClick: (eventPoint) => {
+        this.#handleDeleteClick(eventPoint);
       }
     });
   }
+
+  #handleFormSubmit = (eventPoint) => {
+    const isMinorUpdate = !isDatesEqual(this.#point.dateFrom, eventPoint.dateFrom);
+
+    this.#handleDataChange(
+      this.#isNewPoint ? UserAction.ADD_POINT : UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      eventPoint,
+    );
+
+    if (this.#isNewPoint) {
+      this.#isNewPoint = false;
+    }
+
+    this.#replaceFormToItem();
+  };
 
   #handleFavoriteClick() {
     const updatedEvent = {
@@ -112,18 +141,40 @@ export default class TripEventPresenter {
       isFavorite: !this.#point.isFavorite,
     };
 
-    this.#handleDataChange(updatedEvent);
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      updatedEvent
+    );
   }
 
+  #handleDeleteClick = (eventPoint) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      eventPoint
+    );
+  };
+
   #replaceItemToForm() {
-    replace(this.#eventEditFormComponent, this.#eventComponent);
+    if (this.#isNewPoint) {
+      render(this.#eventEditFormComponent, this.#tripEventsListContainerElement.element, RenderPosition.AFTERBEGIN);
+    } else {
+      replace(this.#eventEditFormComponent, this.#eventComponent);
+    }
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #replaceFormToItem() {
-    replace(this.#eventComponent, this.#eventEditFormComponent);
+    if (this.#isNewPoint) {
+      remove(this.#eventEditFormComponent);
+      this.destroy();
+    } else {
+      replace(this.#eventComponent, this.#eventEditFormComponent);
+    }
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#mode = Mode.DEFAULT;
   }
 
