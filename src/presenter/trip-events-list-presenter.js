@@ -1,9 +1,11 @@
-import {render, RenderPosition} from '../render.js';
-import TripEventsListView from '../view/trip-events-list-view.js';
-import EventsEmptyView from '../view/trip-events-empty-view.js';
+import {render, RenderPosition} from '../render';
+import TripEventsListView from '../view/trip-events-list-view';
+import EventsEmptyView from '../view/trip-events-empty-view';
+import LoadingView from '../view/loading-view.js';
 import TripEventPresenter from './trip-event-presenter';
 import {SortType, UpdateType, UserAction} from '../const';
 import {sortEventByDate, sortEventByPrice, sortEventByTime} from '../eventPoint';
+import {remove} from '../framework/render';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
@@ -17,6 +19,9 @@ export default class TripEventsList {
 
   #newEventButton = document.querySelector('.trip-main__event-add-btn');
   #isCreatingNewPoint = false;
+
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
 
   constructor(eventsModel, filterModel) {
     this.#eventsModel = eventsModel;
@@ -48,7 +53,7 @@ export default class TripEventsList {
   }
 
   init() {
-    this.#eventsModel.addObserver(this.#handleModelChange);
+    this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelChange);
 
     this.#renderEventsListPoints();
@@ -71,7 +76,7 @@ export default class TripEventsList {
 
   #handleModelChange = () => {
     this.#clearEventsList();
-    this.#renderEventsListPoints(); // Перерисовываем при изменении фильтра или событий
+    this.#renderEventsListPoints();
     this.#recalculateTotalCost();
   };
 
@@ -123,6 +128,11 @@ export default class TripEventsList {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     const listElement = tripEventsSectionElement.querySelector('.trip-events__list');
 
     if (this.eventPoints.length === 0 && !this.#isCreatingNewPoint) {
@@ -143,6 +153,7 @@ export default class TripEventsList {
     }
 
     render(tripEventsListElement, tripEventsSectionElement, RenderPosition.BEFOREEND);
+
     this.eventPoints.forEach((point) => {
       this.#renderEventPoint(point);
     });
@@ -186,6 +197,10 @@ export default class TripEventsList {
     this.#renderEventsListPoints();
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, tripEventsSectionElement, RenderPosition.BEFOREEND);
+  }
+
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.ADD_POINT:
@@ -205,7 +220,7 @@ export default class TripEventsList {
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#eventPresenters.get(data.id).init(data);
+        this.#eventPresenters.get(data.id).init();
         break;
       case UpdateType.MINOR:
         this.#clearEventsList();
@@ -213,6 +228,11 @@ export default class TripEventsList {
         break;
       case UpdateType.MAJOR:
         this.#clearEventsList({resetSortType: true});
+        this.#renderEventsListPoints();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderEventsListPoints();
         break;
     }
