@@ -1,5 +1,5 @@
 import {DATE_FORMAT, TIME_FORMAT} from '../const';
-import {humanizeTaskDueDate} from '../utils';
+import {humanizeTaskDueDate, getDuration} from '../utils';
 import AbstractView from '../framework/view/abstract-view';
 
 function createOfferTemplate({title, price}) {
@@ -29,7 +29,7 @@ function createEventsItemViewTemplate(point, offers, destination) {
               &mdash;
               <time class="event__end-time" datetime=${dateTo}>${humanizeTaskDueDate(dateTo, TIME_FORMAT)}</time>
            </p>
-           <p class="event__duration">30M</p>
+           <p class="event__duration">${getDuration(dateFrom, dateTo)}</p>
          </div>
          <p class="event__price">
          &euro;&nbsp;<span class="event__price-value">${basePrice}</span>

@@ -51,5 +51,4 @@ const EmptyListMessages = {
   PAST: 'There are no past events now',
 };
 
-
 export {DATE_FORMAT, TIME_FORMAT, DATE_TIME_FORMAT, SortType, UserAction, UpdateType, FILTERS, EmptyListMessages};
