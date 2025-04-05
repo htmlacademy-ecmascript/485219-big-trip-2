@@ -112,6 +112,16 @@ export default class EventModel extends Observable {
     return this.#destinations.find((destination) => destination.id === id);
   }
 
+  getOfferPriceById(id) {
+    for (const offerType of this.#offers) {
+      const foundOffer = offerType.offers.find((offer) => offer.id === id);
+      if (foundOffer) {
+        return foundOffer.price;
+      }
+    }
+    return 0;
+  }
+
   getDestinationByName(name) {
     return this.#destinations.find((destination) => destination.name === name);
   }
