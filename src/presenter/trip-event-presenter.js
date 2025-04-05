@@ -74,7 +74,7 @@ export default class TripEventPresenter {
   #createEventPoint() {
     this.#eventComponent = new EventsItemView({
       point: this.#point,
-      offers: this.#availableOffersData,
+      offers: this.#selectedOffersData,
       destination: this.#destination,
       onEditClick: () => {
         this.#replaceItemToForm();

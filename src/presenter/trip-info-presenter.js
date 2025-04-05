@@ -24,24 +24,17 @@ export default class TripInfoPresenter {
   }
 
   #formatDate(dateString) {
-    return humanizeTaskDueDate(dateString, 'MMM D');
+    return humanizeTaskDueDate(dateString, 'D MMM');
   }
 
   #calculateOffersPrice(point) {
-    if (!point || !this.#offersModel.offers) {
+    if (!point || !point.offers || !Array.isArray(point.offers)) {
       return 0;
     }
 
-    const offerType = this.#offersModel.offers.find((offer) => offer.type === point.type);
-    if (!offerType) {
-      return 0;
-    }
-
-    return point.offers.reduce((total, offerId) => {
-      const offer = offerType.offers.find((currentOffer) => currentOffer.id === offerId);
-      return total + (offer?.price || 0);
-    }, 0);
+    return point.offers.reduce((total, offerId) => total + (this.#eventsModel.getOfferPriceById(offerId) || 0), 0);
   }
+
 
   #calculateTotalPrice(points) {
     if (!points) {
@@ -64,8 +57,8 @@ export default class TripInfoPresenter {
       return '';
     }
 
-    const endDate = this.#formatDate(sortedPoints[0].dateTo);
-    const startDate = this.#formatDate(sortedPoints[sortedPoints.length - 1].dateFrom);
+    const endDate = this.#formatDate(sortedPoints[0].dateFrom);
+    const startDate = this.#formatDate(sortedPoints[sortedPoints.length - 1].dateTo);
 
     return `${startDate} — ${endDate}`;
   }
