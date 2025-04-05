@@ -22,12 +22,12 @@ function createDestinationPictures(pictures) {
   return `<img class="event__photo" src=${pictures.src} alt="Event photo">`;
 }
 
-function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination, destinations) {
+function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination, destinations, isDisabled, isSaving, isDeleting) {
   const {basePrice, dateFrom, dateTo, type} = point;
   const {name, description, pictures} = destination;
 
   return `<li class="trip-events__item">
-              <form class="event event--edit" action="#" method="post">
+              <form class="event event--edit" action="#" method="post" ${isDisabled ? 'disabled' : ''}>
                 <header class="event__header">
                   <div class="event__type-wrapper">
                     <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -114,9 +114,13 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
                     <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
                   </div>
 
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Delete</button>
-                  <button class="event__rollup-btn" type="button">
+                  <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>
+                    ${isSaving ? 'Saving...' : 'Save'}
+                  </button>
+                  <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>
+                    ${isDeleting ? 'Deleting...' : 'Delete'}
+                  </button>
+                  <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
                     <span class="visually-hidden">Open event</span>
                   </button>
                 </header>
@@ -162,7 +166,20 @@ export default class EventsItemEditView extends AbstractStatefulView {
 
   #isNewPoint;
 
-  constructor({point, selectedOffers, availableOffers, destination, destinations, onFormSubmit, onEditClick, onChangeType, onChangeDestination, onDeleteClick, isNewPoint = false}) {
+  constructor(
+    {
+      point,
+      selectedOffers,
+      availableOffers,
+      destination,
+      destinations,
+      onFormSubmit,
+      onEditClick,
+      onChangeType,
+      onChangeDestination,
+      onDeleteClick,
+      isNewPoint = false
+    }) {
     super();
     this.#point = point;
     this.#selectedOffers = selectedOffers;
@@ -195,7 +212,10 @@ export default class EventsItemEditView extends AbstractStatefulView {
       this._state.offers,
       this._state.availableOffers,
       this._state.destination,
-      this.#destinations
+      this.#destinations,
+      this._state.isDisabled,
+      this._state.isSaving,
+      this._state.isDeleting,
     );
   }
 
@@ -378,15 +398,24 @@ export default class EventsItemEditView extends AbstractStatefulView {
       destination: {
         ...destination
       },
-      availableOffers: [...availableOffers]
+      availableOffers: [...availableOffers],
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     };
   }
 
   static parseStateToPoint(state) {
-    return {
+    const point = {
       ...state,
       destination: state.destination.id,
-      availableOffers: [...state.availableOffers]
+      offers: [...state.offers]
     };
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
   }
 }
