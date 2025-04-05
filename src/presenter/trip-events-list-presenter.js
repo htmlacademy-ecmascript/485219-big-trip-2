@@ -1,4 +1,5 @@
 import {render, RenderPosition} from '../render';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import TripEventsListView from '../view/trip-events-list-view';
 import EventsEmptyView from '../view/trip-events-empty-view';
 import LoadingView from '../view/loading-view.js';
@@ -9,6 +10,11 @@ import {remove} from '../framework/render';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
 const tripEventsListElement = new TripEventsListView();
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class TripEventsList {
   #eventsModel;
@@ -22,6 +28,11 @@ export default class TripEventsList {
 
   #loadingComponent = new LoadingView();
   #isLoading = true;
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor(eventsModel, filterModel) {
     this.#eventsModel = eventsModel;
@@ -66,12 +77,10 @@ export default class TripEventsList {
       return;
     }
 
-    this.#sortTasks(sortType);
+    this.#currentSortType = sortType;
 
     this.#clearEventsList();
     this.#renderEventsBoard();
-
-    this.#currentSortType = sortType;
   }
 
   #handleModelChange = () => {
@@ -106,22 +115,6 @@ export default class TripEventsList {
           return true;
       }
     });
-  }
-
-  #sortTasks(sortType) {
-    switch (sortType) {
-      case SortType.DAY:
-        this.eventPoints.sort(sortEventByDate);
-        break;
-      case SortType.TIME:
-        this.eventPoints.sort(sortEventByTime);
-        break;
-      case SortType.PRICE:
-        this.eventPoints.sort(sortEventByPrice);
-        break;
-      default:
-        break;
-    }
   }
 
   #renderEventsListPoints() {
@@ -201,26 +194,52 @@ export default class TripEventsList {
     render(this.#loadingComponent, tripEventsSectionElement, RenderPosition.BEFOREEND);
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.ADD_POINT:
-        this.#eventsModel.addPoint(updateType, update);
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#eventPresenters.get(update.id).setAborting();
+          throw new Error(err);
+        }
         this.#isCreatingNewPoint = false;
         this.#newEventButton.removeAttribute('disabled');
         break;
       case UserAction.DELETE_POINT:
-        this.#eventsModel.deletePoint(updateType, update);
+        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventsModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.UPDATE_POINT:
-        this.#eventsModel.updatePoint(updateType, update);
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventsModel.updatePoint(updateType, update);
+        } catch(err) {
+          this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
     }
+
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#eventPresenters.get(data.id).init();
+        this.#eventPresenters.get(data.id).init({
+          point: data,
+          selectedOffersData: [...this.#eventsModel.getSelectedOffers(data.type, data.offers)],
+          availableOffersData: [...this.#eventsModel.getOffersByType(data.type)],
+          destination: this.#eventsModel.getDestinationById(data.destination),
+          eventsModel: this.#eventsModel
+        });
         break;
       case UpdateType.MINOR:
         this.#clearEventsList();

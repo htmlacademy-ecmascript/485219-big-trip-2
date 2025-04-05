@@ -10,12 +10,12 @@ export default class TripFilterPresenter {
   #eventsModel;
   #currentFilterType;
   #filterFormElement = new FilterFormView();
-  #currentFiltersView = null; // Добавляем ссылку на текущий FiltersView
+  #currentFiltersView = null;
 
   constructor(filterModel, eventsModel) {
     this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
-    this.#currentFilterType = this.#filterModel.filter; // Берём начальное значение из модели
+    this.#currentFilterType = this.#filterModel.filter;
     this.#handleFilterChange = this.#handleFilterChange.bind(this);
     this.#eventsModel.addObserver(this.#handleModelEvent);
   }
@@ -44,7 +44,7 @@ export default class TripFilterPresenter {
 
   #applyFilter(eventPoint, filterType) {
     const now = new Date();
-    const eventDateFrom = new Date(eventPoint.dateFrom); // Преобразуем строку в объект Date
+    const eventDateFrom = new Date(eventPoint.dateFrom);
     const eventDateTo = new Date(eventPoint.dateTo);
 
     return {

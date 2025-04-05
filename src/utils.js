@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 import minMax from 'dayjs/plugin/minMax';
 
-
 dayjs.extend(minMax);
+dayjs.extend(duration);
 
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -44,5 +45,19 @@ const convertDateToISO = (date) => {
   return null;
 };
 
-export {getRandomInteger, getRandomArrayElement, humanizeTaskDueDate, updateEvent, convertDateToISO};
+function getDuration(start, end) {
+  const durationEvent = dayjs.duration(dayjs(end).diff(dayjs(start)));
+
+  const totalDays = Math.floor(durationEvent.asDays());
+  const remainingHours = durationEvent.hours();
+  const remainingMinutes = durationEvent.minutes();
+
+  const daysStr = `${totalDays.toString().padStart(2, '0') }D`;
+  const hoursStr = `${remainingHours.toString().padStart(2, '0') }H`;
+  const minutesStr = `${remainingMinutes.toString().padStart(2, '0') }M`;
+
+  return `${daysStr} ${hoursStr} ${minutesStr}`;
+}
+
+export {getRandomInteger, getRandomArrayElement, humanizeTaskDueDate, updateEvent, convertDateToISO, getDuration};
 

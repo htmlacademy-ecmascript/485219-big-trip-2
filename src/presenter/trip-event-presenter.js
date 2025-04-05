@@ -25,7 +25,6 @@ export default class TripEventPresenter {
   #eventEditFormComponent = null;
 
   #mode = Mode.DEFAULT;
-
   #isNewPoint;
 
   constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false}) {
@@ -62,6 +61,10 @@ export default class TripEventPresenter {
 
     if (this.#mode === Mode.EDITING) {
       replace(this.#eventEditFormComponent, prevEventEditFormComponent);
+    }
+
+    if (this.#mode === Mode.EDITING && !this.#isNewPoint) {
+      this.#replaceFormToItem();
     }
 
     remove(prevEventComponent);
@@ -131,8 +134,6 @@ export default class TripEventPresenter {
     if (this.#isNewPoint) {
       this.#isNewPoint = false;
     }
-
-    this.#replaceFormToItem();
   };
 
   #handleFavoriteClick() {
@@ -185,6 +186,36 @@ export default class TripEventPresenter {
       document.removeEventListener('keydown', this.#escKeyDownHandler);
     }
   };
+
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditFormComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditFormComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#eventEditFormComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#eventEditFormComponent.shake(resetFormState);
+  }
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
