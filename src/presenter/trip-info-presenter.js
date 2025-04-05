@@ -32,9 +32,7 @@ export default class TripInfoPresenter {
       return 0;
     }
 
-    return point.offers.reduce((total, offerId) => {
-      return total + (this.#eventsModel.getOfferPriceById(offerId) || 0);
-    }, 0);
+    return point.offers.reduce((total, offerId) => total + (this.#eventsModel.getOfferPriceById(offerId) || 0), 0);
   }
 
 
