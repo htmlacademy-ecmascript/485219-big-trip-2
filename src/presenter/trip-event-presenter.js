@@ -96,14 +96,16 @@ export default class TripEventPresenter {
         document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onEditClick: () => {
+        this.#eventEditFormComponent.reset(this.#point, this.#destination, this.#availableOffersData);
         this.#replaceFormToItem();
         document.removeEventListener('keydown', this.#escKeyDownHandler);
       },
       onChangeType: (newType) => {
         const updatedOffers = this.#eventsModel.getOffersByType(newType);
-
+        this.#point.offers = [];
         this.#eventEditFormComponent.updateElement({
           type: newType,
+          offers: [],
           availableOffers: [...updatedOffers]
         });
       },
@@ -173,6 +175,7 @@ export default class TripEventPresenter {
       remove(this.#eventEditFormComponent);
       this.destroy();
     } else {
+      this.#eventEditFormComponent.reset(this.#point, this.#destination, this.#availableOffersData);
       replace(this.#eventComponent, this.#eventEditFormComponent);
     }
     document.removeEventListener('keydown', this.#escKeyDownHandler);

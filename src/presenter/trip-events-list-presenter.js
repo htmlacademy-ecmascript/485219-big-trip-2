@@ -86,16 +86,7 @@ export default class TripEventsList {
   #handleModelChange = () => {
     this.#clearEventsList();
     this.#renderEventsListPoints();
-    this.#recalculateTotalCost();
   };
-
-  #recalculateTotalCost() {
-    // const events = this.#getFilteredEvents();
-    // const totalCost = events.reduce((sum, event) => sum + event.price, 0);
-    //
-    // document.querySelector('.trip-info__cost').textContent = totalCost;
-    // console.log('recalculateTotalCost');
-  }
 
   #getFilteredEvents(eventPoints, filterType) {
     const now = new Date();
@@ -156,7 +147,8 @@ export default class TripEventsList {
     const eventPresenter = new TripEventPresenter({
       listContainerElement: tripEventsListElement,
       onDataChange: this.#handleViewAction,
-      onModeChange: this.#handleModelEvent,
+      // onModeChange: this.#handleModelEvent,
+      onModeChange: this.#handleModeChange,
     });
 
     eventPresenter.init({
@@ -226,7 +218,6 @@ export default class TripEventsList {
         }
         break;
     }
-
     this.#uiBlocker.unblock();
   };
 
@@ -240,6 +231,7 @@ export default class TripEventsList {
           destination: this.#eventsModel.getDestinationById(data.destination),
           eventsModel: this.#eventsModel
         });
+        this.#rerenderSortedList();
         break;
       case UpdateType.MINOR:
         this.#clearEventsList();
@@ -257,6 +249,12 @@ export default class TripEventsList {
     }
   };
 
+  #rerenderSortedList() {
+    const sortedPoints = this.eventPoints;
+    this.#clearEventsList();
+    sortedPoints.forEach((point) => this.#renderEventPoint(point));
+  }
+
   #handleNewEventButtonClick = () => {
     if (this.#isCreatingNewPoint || this.#newEventButton.hasAttribute('disabled')) {
       return;
@@ -269,7 +267,6 @@ export default class TripEventsList {
     this.#currentSortType = SortType.DAY;
 
     const newPoint = {
-      id: crypto.randomUUID(),
       type: 'flight',
       destination: this.#eventsModel.getDestinations()[0].id,
       dateFrom: new Date().toISOString(),
