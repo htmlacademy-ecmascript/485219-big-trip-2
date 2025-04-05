@@ -25,6 +25,8 @@ function createDestinationPictures(pictures) {
 function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers, destination, destinations, isDisabled, isSaving, isDeleting) {
   const {basePrice, dateFrom, dateTo, type} = point;
   const {name, description, pictures} = destination;
+  const hasDestinationContent = description || (pictures && pictures.length > 0);
+  const hasOffers = availableOffers.length > 0;
 
   return `<li class="trip-events__item">
               <form class="event event--edit" action="#" method="post" ${isDisabled ? 'disabled' : ''}>
@@ -125,26 +127,25 @@ function createEventsItemEditViewTemplate(point, selectedOffers, availableOffers
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-                    <div class="event__available-offers">
-                      ${availableOffers.map((offer) => createEventOfferSelectorTemplate(offer, selectedOffers)).join('')}
-                    </div>
-                  </section>
+                                   ${hasOffers ? `<section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-                  <section class="event__section  event__section--destination">
+    <div class="event__available-offers">
+      ${availableOffers.map((offer) => createEventOfferSelectorTemplate(offer, selectedOffers)).join('')}
+    </div>
+  </section>` : ''}
+
+                  ${hasDestinationContent ? ` <section class="event__section  event__section--destination">
                     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                    <p class="event__destination-description">${description}</p>
-
-                    <div class="event__photos-container">
-                      <div class="event__photos-tape">
-                        ${pictures.map((picture) => createDestinationPictures(picture)).join('')}
-                      </div>
-                    </div>
-
-                  </section>
-                </section>
+                    ${description ? `<p class="event__destination-description">${description}</p>` : ''}
+                    ${pictures && pictures.length > 0 ? `
+                        <div class="event__photos-container">
+                            <div class="event__photos-tape">
+                                ${pictures.map((picture) => createDestinationPictures(picture)).join('')}
+                             </div>
+                        </div>` : ''}
+                     </section>` : ''}
               </form>
             </li>`;
 }
@@ -269,9 +270,16 @@ export default class EventsItemEditView extends AbstractStatefulView {
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#submitClickHandler);
     this.element.querySelector('.event__type-group').addEventListener('change', this.#changeTypeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeOffersHandler);
+    // this.element.querySelector('.event__available-offers').addEventListener('change', this.#changeOffersHandler);
     this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
     this.#setDatepickers();
+
+    if (this._state.availableOffers && this._state.availableOffers.length > 0) {
+      const offersContainer = this.element.querySelector('.event__available-offers');
+      if (offersContainer) {
+        offersContainer.addEventListener('change', this.#changeOffersHandler);
+      }
+    }
 
     if (this.#isNewPoint) {
       this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#handleFormClose);

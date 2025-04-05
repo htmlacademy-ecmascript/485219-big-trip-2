@@ -23,9 +23,8 @@ function calculatesTravelTime(dateFrom, dateTo) {
 }
 
 function sortEventByDate(eventA, eventB) {
-  const weight = getWeightForNullDate(eventA.dateTo, eventB.dateTo);
-
-  return weight ?? dayjs(eventB.dateTo).diff(dayjs(eventA.dateTo));
+  const weight = getWeightForNullDate(eventA.dateFrom, eventB.dateFrom);
+  return weight ?? dayjs(eventA.dateFrom).diff(dayjs(eventB.dateFrom));
 }
 
 function sortEventByPrice(eventA, eventB) {
