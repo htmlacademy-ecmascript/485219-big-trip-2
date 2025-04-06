@@ -19,6 +19,7 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  ERROR: 'ERROR',
 };
 
 const FILTERS = [
@@ -49,6 +50,7 @@ const EmptyListMessages = {
   FUTURE: 'There are no future events now',
   PRESENT: 'There are no present events now',
   PAST: 'There are no past events now',
+  ERROR: 'Failed to load latest route information'
 };
 
 export {DATE_FORMAT, TIME_FORMAT, DATE_TIME_FORMAT, SortType, UserAction, UpdateType, FILTERS, EmptyListMessages};

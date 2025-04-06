@@ -1,7 +1,7 @@
 import TripInfoView from '../view/trip-info-view.js';
 import {render, remove} from '../framework/render.js';
 import {RenderPosition} from '../render';
-import {sortEventByDate} from '../eventPoint';
+import {sortEventByDate} from '../event-point';
 import {humanizeTaskDueDate} from '../utils';
 
 export default class TripInfoPresenter {
@@ -65,13 +65,14 @@ export default class TripInfoPresenter {
 
   #getTripTitle(sortedPoints) {
     if (!sortedPoints || sortedPoints.length === 0) {
-      return '... — ...';
+      return '... - ...';
     }
 
     const startPoint = this.#eventsModel.getDestinationById(sortedPoints[0].destination).name;
+    const middlePoint = this.#eventsModel.getDestinationById(sortedPoints[1].destination).name;
     const endPoint = this.#eventsModel.getDestinationById(sortedPoints[sortedPoints.length - 1].destination).name;
 
-    return sortedPoints.length <= 3 ? `${startPoint} - ${endPoint}` : `${startPoint} — ... — ${endPoint}`;
+    return sortedPoints.length <= 3 ? `${startPoint} - ${middlePoint} - ${endPoint}` : `${startPoint} — ... — ${endPoint}`;
   }
 
   #renderTripInfo() {

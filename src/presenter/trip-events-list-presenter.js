@@ -5,7 +5,7 @@ import EventsEmptyView from '../view/trip-events-empty-view';
 import LoadingView from '../view/loading-view.js';
 import TripEventPresenter from './trip-event-presenter';
 import {SortType, UpdateType, UserAction} from '../const';
-import {sortEventByDate, sortEventByPrice, sortEventByTime} from '../eventPoint';
+import {sortEventByDate, sortEventByPrice, sortEventByTime} from '../event-point';
 import {remove} from '../framework/render';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
@@ -28,6 +28,7 @@ export default class TripEventsList {
 
   #loadingComponent = new LoadingView();
   #isLoading = true;
+  #isError = false;
 
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -112,6 +113,11 @@ export default class TripEventsList {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
+    if (this.#isError) {
+      render(new EventsEmptyView(this.#filterModel.filter.type, this.#isError), tripEventsSectionElement);
+      return;
+    }
+
     if (this.#isLoading) {
       this.#renderLoading();
       return;
@@ -147,7 +153,6 @@ export default class TripEventsList {
     const eventPresenter = new TripEventPresenter({
       listContainerElement: tripEventsListElement,
       onDataChange: this.#handleViewAction,
-      // onModeChange: this.#handleModelEvent,
       onModeChange: this.#handleModeChange,
     });
 
@@ -169,6 +174,15 @@ export default class TripEventsList {
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
     }
+
+    this.#enableAddNewPointButton();
+  }
+
+  #enableAddNewPointButton() {
+    if (this.#isCreatingNewPoint) {
+      this.#isCreatingNewPoint = false;
+      this.#newEventButton.removeAttribute('disabled');
+    }
   }
 
   #renderEventsBoard() {
@@ -180,6 +194,8 @@ export default class TripEventsList {
     }
 
     this.#renderEventsListPoints();
+
+    this.#enableAddNewPointButton();
   }
 
   #renderLoading() {
@@ -194,7 +210,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventsModel.addPoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
           throw new Error(err);
         }
@@ -205,7 +221,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setDeleting();
         try {
           await this.#eventsModel.deletePoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -213,7 +229,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventsModel.updatePoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -246,6 +262,10 @@ export default class TripEventsList {
         remove(this.#loadingComponent);
         this.#renderEventsListPoints();
         break;
+      case UpdateType.ERROR:
+        this.#isError = true;
+        remove(this.#loadingComponent);
+        break;
     }
   };
 
@@ -253,6 +273,7 @@ export default class TripEventsList {
     const sortedPoints = this.eventPoints;
     this.#clearEventsList();
     sortedPoints.forEach((point) => this.#renderEventPoint(point));
+
   }
 
   #handleNewEventButtonClick = () => {
@@ -286,7 +307,13 @@ export default class TripEventsList {
         }
         this.#handleModeChange();
       },
-      isNewPoint: true
+      isNewPoint: true,
+      onFormClose: () => {
+        if (this.#isCreatingNewPoint) {
+          this.#isCreatingNewPoint = false;
+          this.#newEventButton.removeAttribute('disabled');
+        }
+      },
     });
 
     newEventPresenter.init({

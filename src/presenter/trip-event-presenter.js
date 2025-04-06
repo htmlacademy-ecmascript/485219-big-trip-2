@@ -2,8 +2,8 @@ import {remove, replace} from '../framework/render';
 import EventsItemEditView from '../view/trip-events-item-edit-view';
 import EventsItemView from '../view/trip-events-item-view';
 import {UpdateType, UserAction} from '../const';
-import {isDatesEqual} from '../eventPoint';
-import {render, RenderPosition} from '../render'; // Добавляем RenderPosition
+import {isDatesEqual} from '../event-point';
+import {render, RenderPosition} from '../render';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -26,12 +26,14 @@ export default class TripEventPresenter {
 
   #mode = Mode.DEFAULT;
   #isNewPoint;
+  #handleFormClose;
 
-  constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false}) {
+  constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false, onFormClose}) {
     this.#tripEventsListContainerElement = listContainerElement;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
     this.#isNewPoint = isNewPoint;
+    this.#handleFormClose = onFormClose;
   }
 
   init({point, selectedOffersData, availableOffersData, destination, eventsModel}) {
@@ -124,8 +126,29 @@ export default class TripEventPresenter {
     });
   }
 
+  #setButtonsDisabled(isDisabled) {
+    if (this.#eventComponent) {
+      const rollupButton = this.#eventEditFormComponent.element.querySelector('.event__rollup-btn');
+      if (rollupButton) {
+        rollupButton.disabled = isDisabled;
+      }
+
+      const saveButton = this.#eventEditFormComponent.element.querySelector('.event__save-btn');
+      if (saveButton) {
+        saveButton.disabled = isDisabled;
+      }
+
+      const deleteButton = this.#eventEditFormComponent.element.querySelector('.event__reset-btn');
+      if (deleteButton) {
+        deleteButton.disabled = isDisabled;
+      }
+    }
+  }
+
   #handleFormSubmit = (eventPoint) => {
     const isMinorUpdate = !isDatesEqual(this.#point.dateFrom, eventPoint.dateFrom);
+
+    this.#setButtonsDisabled(true);
 
     this.#handleDataChange(
       this.#isNewPoint ? UserAction.ADD_POINT : UserAction.UPDATE_POINT,
@@ -152,6 +175,8 @@ export default class TripEventPresenter {
   }
 
   #handleDeleteClick = (eventPoint) => {
+    this.#setButtonsDisabled(true);
+
     this.#handleDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
@@ -174,6 +199,7 @@ export default class TripEventPresenter {
     if (this.#isNewPoint) {
       remove(this.#eventEditFormComponent);
       this.destroy();
+      this.#handleFormClose?.();
     } else {
       this.#eventEditFormComponent.reset(this.#point, this.#destination, this.#availableOffersData);
       replace(this.#eventComponent, this.#eventEditFormComponent);
@@ -196,6 +222,7 @@ export default class TripEventPresenter {
         isDisabled: true,
         isSaving: true
       });
+      this.#setButtonsDisabled(true);
     }
   }
 
@@ -205,6 +232,7 @@ export default class TripEventPresenter {
         isDisabled: true,
         isDeleting: true
       });
+      this.#setButtonsDisabled(true);
     }
   }
 
