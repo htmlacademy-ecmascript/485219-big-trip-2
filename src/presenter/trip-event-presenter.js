@@ -3,7 +3,7 @@ import EventsItemEditView from '../view/trip-events-item-edit-view';
 import EventsItemView from '../view/trip-events-item-view';
 import {UpdateType, UserAction} from '../const';
 import {isDatesEqual} from '../eventPoint';
-import {render, RenderPosition} from '../render'; // Добавляем RenderPosition
+import {render, RenderPosition} from '../render';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -129,45 +129,25 @@ export default class TripEventPresenter {
       const rollupButton = this.#eventEditFormComponent.element.querySelector('.event__rollup-btn');
       if (rollupButton) {
         rollupButton.disabled = isDisabled;
-        console.log(`rollupButton.disabled ${rollupButton.disabled}`);
       }
 
       const saveButton = this.#eventEditFormComponent.element.querySelector('.event__save-btn');
       if (saveButton) {
         saveButton.disabled = isDisabled;
-        console.log(`rollupButton.disabled ${saveButton.disabled}`);
       }
 
       const deleteButton = this.#eventEditFormComponent.element.querySelector('.event__reset-btn');
       if (deleteButton) {
         deleteButton.disabled = isDisabled;
-        console.log(`rollupButton.disabled ${deleteButton.disabled}`);
       }
     }
   }
 
-  // #handleFormSubmit = (eventPoint) => {
-  //   const isMinorUpdate = !isDatesEqual(this.#point.dateFrom, eventPoint.dateFrom);
-  //   this.#setButtonsDisabled(true);
-  //
-  //   this.#handleDataChange(
-  //     this.#isNewPoint ? UserAction.ADD_POINT : UserAction.UPDATE_POINT,
-  //     isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-  //     eventPoint,
-  //   );
-  //
-  //   if (this.#isNewPoint) {
-  //     this.#isNewPoint = false;
-  //   }
-  // };
-
   #handleFormSubmit = (eventPoint) => {
     const isMinorUpdate = !isDatesEqual(this.#point.dateFrom, eventPoint.dateFrom);
 
-    // 1. Сначала блокируем кнопки СИНХРОННО
     this.#setButtonsDisabled(true);
 
-    // 2. Затем вызываем асинхронный код
     this.#handleDataChange(
       this.#isNewPoint ? UserAction.ADD_POINT : UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
@@ -192,18 +172,9 @@ export default class TripEventPresenter {
     );
   }
 
-  // #handleDeleteClick = (eventPoint) => {
-  //   this.#handleDataChange(
-  //     UserAction.DELETE_POINT,
-  //     UpdateType.MINOR,
-  //     eventPoint
-  //   );
-  // };
   #handleDeleteClick = (eventPoint) => {
-    // 1. Блокируем кнопки СИНХРОННО
     this.#setButtonsDisabled(true);
 
-    // 2. Затем вызываем асинхронный код
     this.#handleDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
