@@ -1,7 +1,7 @@
 import TripInfoView from '../view/trip-info-view.js';
 import {render, remove} from '../framework/render.js';
 import {RenderPosition} from '../render';
-import {sortEventByDate} from '../eventPoint';
+import {sortEventByDate} from '../event-point';
 import {humanizeTaskDueDate} from '../utils';
 
 export default class TripInfoPresenter {

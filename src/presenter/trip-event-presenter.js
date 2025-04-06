@@ -2,7 +2,7 @@ import {remove, replace} from '../framework/render';
 import EventsItemEditView from '../view/trip-events-item-edit-view';
 import EventsItemView from '../view/trip-events-item-view';
 import {UpdateType, UserAction} from '../const';
-import {isDatesEqual} from '../eventPoint';
+import {isDatesEqual} from '../event-point';
 import {render, RenderPosition} from '../render';
 
 const Mode = {

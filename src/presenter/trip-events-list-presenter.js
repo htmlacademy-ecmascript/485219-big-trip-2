@@ -5,7 +5,7 @@ import EventsEmptyView from '../view/trip-events-empty-view';
 import LoadingView from '../view/loading-view.js';
 import TripEventPresenter from './trip-event-presenter';
 import {SortType, UpdateType, UserAction} from '../const';
-import {sortEventByDate, sortEventByPrice, sortEventByTime} from '../eventPoint';
+import {sortEventByDate, sortEventByPrice, sortEventByTime} from '../event-point';
 import {remove} from '../framework/render';
 
 const tripEventsSectionElement = document.querySelector('.trip-events');
