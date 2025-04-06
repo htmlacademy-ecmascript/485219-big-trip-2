@@ -65,13 +65,14 @@ export default class TripInfoPresenter {
 
   #getTripTitle(sortedPoints) {
     if (!sortedPoints || sortedPoints.length === 0) {
-      return '... — ...';
+      return '';
     }
 
     const startPoint = this.#eventsModel.getDestinationById(sortedPoints[0].destination).name;
+    const middlePoint = this.#eventsModel.getDestinationById(sortedPoints[1].destination).name;
     const endPoint = this.#eventsModel.getDestinationById(sortedPoints[sortedPoints.length - 1].destination).name;
 
-    return sortedPoints.length <= 3 ? `${startPoint} - ${endPoint}` : `${startPoint} — ... — ${endPoint}`;
+    return sortedPoints.length <= 3 ? `${startPoint} - ${middlePoint} - ${endPoint}` : `${startPoint} — ... — ${endPoint}`;
   }
 
   #renderTripInfo() {
