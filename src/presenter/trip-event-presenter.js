@@ -26,12 +26,14 @@ export default class TripEventPresenter {
 
   #mode = Mode.DEFAULT;
   #isNewPoint;
+  #handleFormClose;
 
-  constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false}) {
+  constructor({listContainerElement, onDataChange, onModeChange, isNewPoint = false, onFormClose}) {
     this.#tripEventsListContainerElement = listContainerElement;
     this.#handleDataChange = onDataChange;
     this.#handleModeChange = onModeChange;
     this.#isNewPoint = isNewPoint;
+    this.#handleFormClose = onFormClose;
   }
 
   init({point, selectedOffersData, availableOffersData, destination, eventsModel}) {
@@ -197,6 +199,7 @@ export default class TripEventPresenter {
     if (this.#isNewPoint) {
       remove(this.#eventEditFormComponent);
       this.destroy();
+      this.#handleFormClose?.();
     } else {
       this.#eventEditFormComponent.reset(this.#point, this.#destination, this.#availableOffersData);
       replace(this.#eventComponent, this.#eventEditFormComponent);

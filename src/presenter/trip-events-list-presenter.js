@@ -174,6 +174,15 @@ export default class TripEventsList {
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
     }
+
+    this.#enableAddNewPointButton();
+  }
+
+  #enableAddNewPointButton() {
+    if (this.#isCreatingNewPoint) {
+      this.#isCreatingNewPoint = false;
+      this.#newEventButton.removeAttribute('disabled');
+    }
   }
 
   #renderEventsBoard() {
@@ -185,6 +194,8 @@ export default class TripEventsList {
     }
 
     this.#renderEventsListPoints();
+
+    this.#enableAddNewPointButton();
   }
 
   #renderLoading() {
@@ -199,7 +210,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventsModel.addPoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
           throw new Error(err);
         }
@@ -210,7 +221,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setDeleting();
         try {
           await this.#eventsModel.deletePoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -218,7 +229,7 @@ export default class TripEventsList {
         this.#eventPresenters.get(update.id).setSaving();
         try {
           await this.#eventsModel.updatePoint(updateType, update);
-        } catch(err) {
+        } catch (err) {
           this.#eventPresenters.get(update.id).setAborting();
         }
         break;
@@ -262,6 +273,7 @@ export default class TripEventsList {
     const sortedPoints = this.eventPoints;
     this.#clearEventsList();
     sortedPoints.forEach((point) => this.#renderEventPoint(point));
+
   }
 
   #handleNewEventButtonClick = () => {
@@ -295,7 +307,13 @@ export default class TripEventsList {
         }
         this.#handleModeChange();
       },
-      isNewPoint: true
+      isNewPoint: true,
+      onFormClose: () => {
+        if (this.#isCreatingNewPoint) {
+          this.#isCreatingNewPoint = false;
+          this.#newEventButton.removeAttribute('disabled');
+        }
+      },
     });
 
     newEventPresenter.init({
