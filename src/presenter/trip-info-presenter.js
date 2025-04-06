@@ -65,7 +65,7 @@ export default class TripInfoPresenter {
 
   #getTripTitle(sortedPoints) {
     if (!sortedPoints || sortedPoints.length === 0) {
-      return '';
+      return '... - ...';
     }
 
     const startPoint = this.#eventsModel.getDestinationById(sortedPoints[0].destination).name;
