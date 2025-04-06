@@ -1,5 +1,5 @@
 import {render, RenderPosition} from '../render';
-import FiltersView from '../view/filter-view';
+import FiltersView from '../view/filters-view';
 import FilterFormView from '../view/filter-form-view';
 import {generateFilter} from '../filter';
 
