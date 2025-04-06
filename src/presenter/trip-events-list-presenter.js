@@ -28,6 +28,7 @@ export default class TripEventsList {
 
   #loadingComponent = new LoadingView();
   #isLoading = true;
+  #isError = false;
 
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
@@ -112,6 +113,11 @@ export default class TripEventsList {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
+    if (this.#isError) {
+      render(new EventsEmptyView(this.#filterModel.filter.type, this.#isError), tripEventsSectionElement);
+      return;
+    }
+
     if (this.#isLoading) {
       this.#renderLoading();
       return;
@@ -147,7 +153,6 @@ export default class TripEventsList {
     const eventPresenter = new TripEventPresenter({
       listContainerElement: tripEventsListElement,
       onDataChange: this.#handleViewAction,
-      // onModeChange: this.#handleModelEvent,
       onModeChange: this.#handleModeChange,
     });
 
@@ -245,6 +250,10 @@ export default class TripEventsList {
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderEventsListPoints();
+        break;
+      case UpdateType.ERROR:
+        this.#isError = true;
+        remove(this.#loadingComponent);
         break;
     }
   };
