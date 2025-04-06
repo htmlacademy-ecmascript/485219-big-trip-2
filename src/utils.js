@@ -9,17 +9,8 @@ function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function getRandomArrayElement(array) {
-  const randomIndex = getRandomInteger(0, array.length);
-  return array[randomIndex];
-}
-
 function humanizeTaskDueDate(date, format) {
   return date ? dayjs(date).format(format) : '';
-}
-
-function updateEvent(eventsPoints, updatedEventPoint) {
-  return eventsPoints.map((eventPoint) => eventPoint.id === updatedEventPoint.id ? updatedEventPoint : eventPoint);
 }
 
 const convertDateToISO = (date) => {
@@ -59,5 +50,5 @@ function getDuration(start, end) {
   return `${daysStr} ${hoursStr} ${minutesStr}`;
 }
 
-export {getRandomInteger, getRandomArrayElement, humanizeTaskDueDate, updateEvent, convertDateToISO, getDuration};
+export {getRandomInteger, humanizeTaskDueDate, convertDateToISO, getDuration};
 
